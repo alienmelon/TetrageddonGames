@@ -1,0 +1,6 @@
+
+Options +Indexes
+
+ReadmeName directoryHeader.html
+
+IndexIgnore directoryHeader.html
