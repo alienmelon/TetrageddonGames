@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=.5, user-scalable=yes">
+<title>YOUR COMPUTER IS INFECTED WITH CYBERZOMBIES!</title>
+	
+	<style>
+		
+		@font-face {
+    		font-family: 'pixel_arial_11bold';
+    		src: url('fontsquirrel_arialPB/pixeab__-webfont.eot');
+    		src: url('fontsquirrel_arialPB/pixeab__-webfont.eot?#iefix') format('embedded-opentype'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.woff2') format('woff2'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.woff') format('woff'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.ttf') format('truetype'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.svg#pixel_arial_11bold') format('svg');
+    		font-weight: normal;
+    		font-style: normal;
+		}
+		@font-face {
+    		font-family: 'pixel_arial_11regular';
+    		src: url('fontsquirrel_arialPREG/pixearg_-webfont.eot');
+    		src: url('fontsquirrel_arialPREG/pixearg_-webfont.eot?#iefix') format('embedded-opentype'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.woff2') format('woff2'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.woff') format('woff'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.ttf') format('truetype'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.svg#pixel_arial_11regular') format('svg');
+    		font-weight: normal;
+    		font-style: normal;
+		}
+		
+		body{
+			background: url("images/CYBERZOMBIES/IMG_ZOMBIES.gif") no-repeat center center fixed;
+			background-size: cover;
+			
+			image-rendering: pixelated;
+  			image-rendering: crisp-edges;
+			
+			font-smooth: never;
+			-webkit-font-smoothing : none;
+		}
+		
+		.closeWindowButton:hover{
+			content:url("images/CYBERZOMBIES/IMG_CYBERZOMBIE_CLOSE_PRESS.png");
+		}
+		
+		#zombieAudio{
+			position: absolute;
+			/*bottom: 0px;
+			right: 0px;*/
+			z-index: 200;
+		}
+		
+		#actnow{
+			font-family: 'pixel_arial_11bold', Helvetica, Arial, "sans-serif";
+  			position: absolute;
+			top: 50%;
+			left: 50%;
+			/*width: 100px;*/
+			font-size: 15px;
+			cursor: pointer;
+			z-index: 100;
+		}
+		
+		
+		
+	</style>
+	
+	<script>
+		
+		var str_imageURL = 'images/CYBERZOMBIES/';
+		var str_soundURL = 'SOUND/CYBERZOMBIES/';
+		
+		var arr_sounds = ["zombie-1.mp3", "zombie-2.mp3", "zombie-3.mp3", "zombie-4.mp3", "zombie-5.mp3"];
+		
+		var arr_zombies = ["IMG_CYBERZOMBIE_04.gif", "IMG_CYBERZOMBIE_01.gif", "IMG_CYBERZOMBIE_02.gif", "IMG_CYBERZOMBIE_03.gif"];
+		var arr_zombieSounds = ["Guuuuh!", "Gaaawh!", "Graaaw!", "Gaaaeugh!", "Nuughuu!", "Mooahgh!", "Eeeuugh!"];
+		var arr_zombieTypes = ["Stinky", "Bad", "Evil", "Tired", "Sad", "Kinky", "Nosy", "Crying", "Bemoaned", "Groaning", "Moaning", "Undead", "Rotten", "Gross", "Glitchy", "Half-eaten"];
+		//danger!
+		var arr_criesForHelp = ["Run away!", "It's after you!", "Hide!!", "Find a safe place to hide!", "RUN!!!", "Quickly! Run!!", "You can't outrun this one!", "They're too fast!", "They're going to eat you!", "We're doomed!", "Doom!", "You're doomed!", "You're going to get eaten!", "Oh no!", "NooOOOoOOoooo!", "Nothing can save us now!", "Help! AAaaaAAaa!"];
+		
+		var arr_zombieWindows = [];
+		
+		var num_zombieAmnt = 20;
+		var num_zombieWindowWidth = 210;
+		var num_zombieWindowHeight = 201;
+		//interval
+		var int_zombies;
+		
+		//make image tag for innerHTML
+		function returnImage(str_imagename){
+			return '<img src=' + str_imageURL + str_imagename + ">"
+		}
+		//random array element
+		function returnArray(arr){
+			return arr[Math.ceil(Math.random()*arr.length)-1];
+		}
+		//document width and height
+		function returnDocWidth(){
+			var num_width = window.innerWidth
+			|| document.documentElement.clientWidth
+			|| document.body.clientWidth;
+			return num_width;
+		}
+		function returnDocHeight(){
+			var num_height = window.innerHeight
+			|| document.documentElement.clientHeight
+			|| document.body.clientHeight;
+			return num_height;
+		}
+		
+		function playSound(sndFile){
+			var snd = new Audio(str_soundURL + sndFile);
+			snd.play();
+		}
+		
+		
+		function makeZombie(num){
+			//TODO, MOVE UP TO MAKEZOMBIE AND ADD NUM WHEN DONE
+			
+			//window container
+			var cyberzombie = document.createElement("div");
+			cyberzombie.id = "cyberzombie_" + String(num);
+			//cyberzombie.style.backgroundImage = "url(" + str_imageURL + "'IMG_CYBERZOMBIE_WINDOW.png')";
+			cyberzombie.innerHTML = returnImage("IMG_CYBERZOMBIE_WINDOW.png");
+			cyberzombie.style.width = num_zombieWindowWidth + 'px';
+			cyberzombie.style.height = num_zombieWindowHeight + 'px';
+			cyberzombie.style.position = "fixed";
+			//the UI elements
+			//title
+			var window_title = document.createElement("div");
+			window_title.id = "window_title" + String(num);
+			window_title.innerHTML = returnArray(arr_zombieTypes) + " CyberZombie";
+			window_title.style.position = "absolute";
+			window_title.style.top = "5px";
+			window_title.style.left = "5px";
+			window_title.style.fontSize = "9px";
+			window_title.style.fontFamily = "'pixel_arial_11bold', Helvetica, Arial, 'sans-serif'";
+			//close button
+			var window_close = document.createElement("div");
+			window_close.id = "window_close" + String(num);
+			window_close.className = "closeWindowButton";
+			window_close.innerHTML = returnImage("IMG_CYBERZOMBIE_CLOSE_OUT.png");
+			window_close.style.position = "absolute";
+			window_close.style.top = "5px";
+			window_close.style.right = "5px";
+			//window subtitle (bellow title)
+			var window_text = document.createElement("div");
+			window_text.id = "window_text" + String(num);
+			window_text.innerHTML = returnArray(arr_zombieSounds);
+			window_text.style.position = "absolute";
+			window_text.style.top = "25px";
+			window_text.style.left = "5px";
+			window_text.style.fontSize = "9px";
+			window_text.style.fontFamily = "'pixel_arial_11regular', Helvetica, Arial, 'sans-serif'";
+			//the zombie gif
+			var window_zombie = document.createElement("div");
+			window_zombie.id = "window_zombie" + String(num);
+			window_zombie.innerHTML = returnImage(returnArray(arr_zombies));
+			window_zombie.style.position = "absolute";
+			window_zombie.style.left = "5px";
+			window_zombie.style.top = "44px";
+			//the subtext...
+			var window_subtext = document.createElement("div");
+			window_subtext.id = "window_subtext" + String(num);
+			window_subtext.innerHTML = returnArray(arr_criesForHelp);
+			window_subtext.style.position = "absolute";
+			window_subtext.style.left = "5px";
+			window_subtext.style.bottom = "5px";
+			window_subtext.style.fontSize = "9px";
+			window_subtext.style.fontFamily = "'pixel_arial_11regular', Helvetica, Arial, 'sans-serif'";
+			
+			//append all
+			cyberzombie.appendChild(window_title);
+			cyberzombie.appendChild(window_close);
+			cyberzombie.appendChild(window_text);
+			cyberzombie.appendChild(window_zombie);
+			cyberzombie.appendChild(window_subtext);
+			//append main
+			document.getElementsByTagName("body")[0].appendChild(cyberzombie);
+			//array
+			arr_zombieWindows.push(cyberzombie);
+			
+			//random placement of main
+			resetZombie(cyberzombie);
+			
+			//event listener
+			window_close.addEventListener("click", function(e){
+				playSound(returnArray(arr_sounds));
+				resetZombie(cyberzombie);
+			})
+		}
+		
+		function moveZombies(){
+			for(let i=0; i<arr_zombieWindows.length; ++i){
+				//
+				var clip = arr_zombieWindows[i];
+				var curr_y = parseInt(clip.style.top);
+				//move up...
+				clip.style.top = String(curr_y -= (Math.round(Math.random()) * 4 - 5)) + "px";
+				//if at top, reset...
+				if(curr_y > (returnDocHeight() + num_zombieWindowHeight)){ //if oposite direction: < (-num_zombieWindowHeight)
+					resetZombie(clip);
+				}
+			}
+		}
+		
+		function resetZombie(cyberzombie){
+			cyberzombie.style.left = String(Math.ceil(Math.random()*returnDocWidth()) - num_zombieWindowWidth) + "px";
+			cyberzombie.style.top = String(Math.ceil(Math.random()*returnDocHeight()) - num_zombieWindowHeight) + "px";
+		}
+		
+		//call to make all
+		function makeZombies(){
+			for(let i = 0; i<num_zombieAmnt; ++i){
+				makeZombie(i);
+			}
+		}
+		
+		//call to start
+		function cyberzombie_check(){
+			window.alert("YES! YOUR COMPUTER IS INFECTED WITH CYBERZOMBIES!\nPLEASE CONSULT YOUR VIRUS SCANNER AT ONCE.\nCYBERZOMBIE IS INCURABLE. YOU MUST ACT NOW!");
+			//
+			makeZombies();
+			//move
+			int_zombies = setInterval(moveZombies, 50);
+			//sound
+			//playSound(returnArray(arr_sounds));
+			//document.getElementById("snd_zombies").play();
+		}
+		// 
+	</script>
+	
+</head>
+
+<body onload="cyberzombie_check();">
+	
+	<button type="button" id="actnow" onclick="location.href='actnow.html'">ACT NOW</button>
+	
+	 <audio id="zombieAudio" controls loop autoplay>
+	  <source src="SOUND/CYBERZOMBIES/cyberzombies.mp3" type="audio/mpeg">
+	  	Your browser does not support zombie sounds.
+	</audio>
+	
+</body>
+</html>

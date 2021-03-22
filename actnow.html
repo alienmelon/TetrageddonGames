@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>You have been cured!</title>
+		
+	<style>
+		body{
+			background: url("images/COMPUTERANGELS/IMG_CLOUDS_01.gif") no-repeat center center fixed;
+			background-size: cover;
+			
+			image-rendering: pixelated;
+  			image-rendering: crisp-edges;
+
+ 			overflow: hidden;
+		}
+		
+		#footer{
+			cursor:pointer;
+			position:absolute;
+			bottom: 0px;
+			left: 0px;
+			z-index: 100;
+		}
+		
+	</style>
+	
+	<script>
+	
+		var snd_aah = "SOUND/COMPUTERANGELS/aah.mp3";
+		
+		//folder name
+		var str_angel_imagePath = "images/COMPUTERANGELS/";
+		//image names
+		var arr_angel_images = ["angel.gif"];
+		//all the angel divs
+		var arr_angel_div = [];
+		var arr_angel_ids = [];
+		
+		var num_angelHeight = 248;
+		var num_angelWidth = 189;
+
+		function angel_returnDocWidth(){
+			var num_width = window.innerWidth
+			|| document.documentElement.clientWidth
+			|| document.body.clientWidth;
+			return num_width;
+		}
+
+		function angel_returnDocHeight(){
+			var num_height = window.innerHeight
+			|| document.documentElement.clientHeight
+			|| document.body.clientHeight;
+			return num_height;
+		}
+
+		//place angel randomly
+		function angel_place_randomly(div){
+			div.style.top = String(Math.random()*angel_returnDocHeight()) + "px";
+			div.style.left = String(Math.random()*angel_returnDocWidth()) + "px";
+		};
+
+		//send angel back to top at random
+		function reset_angel(div){
+			div.style.top = String(angel_returnDocHeight()) + "px"; // - num_angelHeight
+			div.style.left = String((Math.random()*angel_returnDocWidth())) + "px";	// - num_angelWidth
+		}
+
+		function init_angel(div, intervalID, num_windSpeed, num_fallSpeed){
+			//setup
+			var num_angel_radius = 0;
+			var num_angel_i = num_fallSpeed;
+			var num_angel_k = -Math.PI + Math.random()*Math.PI;
+			//
+			var num_angel_x = parseInt(div.style.left);
+			var num_angel_y = parseInt(div.style.top);
+			//move
+			function _interval(){
+				//
+				num_angel_x = parseInt(div.style.left);
+				num_angel_y = parseInt(div.style.top);
+				// horizontal movement
+				num_angel_radius += (num_angel_k/180)*Math.PI;
+				div.style.left = String(num_angel_x -= num_windSpeed*(Math.cos(num_angel_radius))) + "px";
+				// vertical movement
+				div.style.top = String(num_angel_y -= num_angel_i) + "px";
+				//bounds
+				if (num_angel_y < - 50) {
+					reset_angel(div);
+				}
+				if (num_angel_x > angel_returnDocWidth() - 50){
+					reset_angel(div);
+				};
+				//
+			};
+			//interval id's & start...
+			window["id_angel_flake_" + String(intervalID)] = setInterval(_interval, 30);
+			arr_angel_ids.push(window["id_angel_flake_" + String(intervalID)]);
+		};
+
+		//call this to clear the weather
+		function stop_angeling(){
+			for (var i = 0; i<arr_angel_ids.length; ++i){
+				clearInterval(arr_angel_ids[i]);
+			};
+			//
+			for (var n = 0; n< arr_angel_div.length; ++n){
+				arr_angel_div[n].remove();
+			};
+		}
+
+		//call this to start angeling
+		//recommended amounts for...
+		//num_windSpeed = 10
+		//num_fallSpeed = 5
+		function start_angeling(num_angelAmount, num_windSpeed, num_fallSpeed){
+			//clear first (just incase)
+			arr_angel_div = [];
+			arr_angel_ids = [];
+			//
+			for (let i = 0; i<num_angelAmount; ++i){
+				//
+				var angel_flake = document.createElement("div");
+				angel_flake.id = "_angel_flake_" + String(i);
+				angel_flake.className = "angel";
+				//angel.appendChild(angel_flake);
+				//images
+				angel_flake.innerHTML = '<img src=' + str_angel_imagePath + arr_angel_images[Math.ceil(Math.random()*arr_angel_images.length)-1] + '>';
+				angel_flake.style.position = 'absolute';
+				angel_place_randomly(angel_flake);
+				angel_flake.style.pointerEvents = "none";
+				//
+				document.getElementsByTagName("body")[0].appendChild(angel_flake);
+				arr_angel_div.push(angel_flake);
+				init_angel(angel_flake, i, num_windSpeed, num_fallSpeed);
+				
+			};
+			//
+		};
+		
+		
+		function makeVisitorSafe(){
+			
+			window.alert("You have been blessed by computer angels.\nYou are now cured of the cyberzombie plague.");
+			start_angeling(40, 10, 5);
+			
+			document.getElementById("footer").addEventListener("click", function(e){
+				var snd = new Audio(snd_aah);
+				snd.play();
+			})
+			
+		}
+		
+	</script>
+	
+</head>
+
+<body onload="makeVisitorSafe();">
+	<img src="images/COMPUTERANGELS/alert.png" id="footer" alt="This website is protected by computer angels.">
+</body>
+</html>

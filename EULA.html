@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+<title>beware: herein lies the EULA</title>
+<script src="pet_cursor.js"></script>
+<script src="haunt_your_website/ghost.js"></script>
+	
+	<script>
+		
+		function incantationSuccess(){
+			console.log("Your incantation has been accepted. The EULA is now legally binding.");
+			var likelyhood_of_failure = Math.random()*100;
+			//
+			try{
+				reset_ghost();
+			}catch(e){
+				console.log("...");
+			}
+			//
+			document.getElementById("accept").style.visibility = "hidden";
+			//
+			if(likelyhood_of_failure > 50){
+				//bad incantation, a ghastly entity has been summoned instead
+				alert("Warning: bad incantation! You have not accepted correctly. Now a ghastly virtual entity haunts you.")
+				ghost_init(true);
+			}else{
+				//success, you are bound, you may continue
+				alert("Success: Your incantation of this EULA has been accepted and you may now safely continue on your internet travels.")
+			}
+		}
+		
+	</script>
+	
+	<style>
+		#EULA{
+			font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+			width: 300px;
+			padding: 30px;
+			margin: auto;
+			left: 50%;
+		}
+		body{
+			background-color: #FFFFE1;
+		}
+		button{
+			width: 200px;
+			height: 40px;
+			font-weight: bold;
+			cursor: pointer;
+		}
+		
+	</style>
+	
+</head>
+	
+	
+<body onload="startPetCursor();">
+	
+	<div id="EULA">
+		
+		<h1>End-User License Agreement (EULA) of Tetrageddon</h1>
+<br><br>
+This End-User License Agreement (henceforth referred to as "EULA" or "The Governing Law of the Land") is a legal, forever binding, agreement between you and the cursed website entity known as ARMAGAD.
+<br><br>
+Please read this EULA agreement out loud, maintaining a continuous low tonal pitch, while observing the incantations carefully. In the event that you do not correctly read this EULA there is a strong likelihood that a ghastly entity may be summoned.
+Once the incantation is complete, and this EULA has been read in its entirety, by clicking "accept" or visiting Tetrageddon, you are confirming your acceptance of said incantation and agreeing to become bound by the terms of this website. This binding is forever. It cannot be broken.
+<br><br>
+If you are entering into this EULA on behalf of a company or other legal entity, including illegal entities and void entities, you represent that you have the authority to bind such entities and their affiliate entities to this EULA. Once bound, the binding cannot be unbound. Adventurers much braver and much more heroic than yourself have tried.
+If you do not have such authority or if you do not agree with the terms set forth by this EULA, please seek the legal council of a higher website authority before entering this website. We do not accept responsibility for the unbound.
+<br><br>
+This EULA agreement shall apply only to Tetrageddon and any website visited hereonafter as a necessary precaution to those that have not yet read this EULA but may have come into contact with you, regardless of whether other websites are referred to or described herein. The terms also apply to any updates, supplements, Internet-based services, and support services from Tetrageddon, unless other incantations accompany those items.
+<br><br>
+		<h1>License Grant</h1>
+<br><br>
+Tetrageddon, and the cursed entity ARMAGAD, hereby and hitherto grant you a personal, non-transferable, non-exclusive, non-invasive, safe, and completely legitimate license to use Tetrageddon on your devices in accordance with the terms of this EULA agreement.
+<br><br>
+You are permitted to load Tetrageddon (for example a PC, laptop, mobile, tablet, or functioning human brain) under your control. In the event that control is lost you are no longer bound by this EULA, and we do not accept any liabilities for said loss of control.
+<br><br>
+You are not permitted to:
+<br><br>
+		<ul>
+		<li>Speak ill of this EULA.</li>
+		<li>Speak in disfavor of this website or any of its subsidiary sites.</li>
+		<li>Speak of this website at all, since unkind words may harm the emotional health of this website's inhabitants. This point is up to interpretation.</li>
+		<li>Use this website in any way which breaches any applicable local, national, of international law.</li>
+		<li>Use this website for any purpose that Tetrageddon, or the cursed entity ARMAGAD, considers a breach of this EULA. This point is up to interpretation.</li>
+		</ul>
+<br><br>
+		<h1>Intellectual Property and Ownership</h1>
+<br><br>
+Neither this website, EULA, ARMAGAD, or Tetrageddon (and the copyright, and other intellectual property rights of whatever nature in this website, including any modifications made thereto) may be considered intellectual. There is no owner. There is no property. There is no god. The digital realm is cold and empty. Consider this a fact.
+<br><br>
+		<h1>Termination</h1>
+<br><br>
+This EULA agreement is effective from the date you first visit Tetrageddon and shall continue until terminated by an entity more powerful than the one summoned by this EULA. In the event of termination, this EULA remains binding, even in the event of terminal termination.
+The provisions that by their nature continue to survive will survive any termination of this EULA agreement.
+<br><br>
+		<h1>Governing Law</h1>
+<br><br>
+There is no law. The internet is a broken and lawless wasteland as governed by the incantation of this EULA.
+<br><br>
+You are now ready to accept this EULA.
+		<br>
+Please bow your head, and say:<br>
+		<i>"I accept."</i>
+<br><br>
+		<center><button type="button" onclick="incantationSuccess();" id="accept">I ACCEPT</button></center>
+		
+	</div>
+	
+</body>
+</html>

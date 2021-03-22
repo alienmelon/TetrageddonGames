@@ -1,0 +1,272 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=.5, maximum-scale=.5, user-scalable=yes">
+<title>Scream Into The Void</title>
+	
+	<style>
+		
+		@font-face {
+    		font-family: 'pixel_arial_11bold';
+    		src: url('fontsquirrel_arialPB/pixeab__-webfont.eot');
+    		src: url('fontsquirrel_arialPB/pixeab__-webfont.eot?#iefix') format('embedded-opentype'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.woff2') format('woff2'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.woff') format('woff'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.ttf') format('truetype'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.svg#pixel_arial_11bold') format('svg');
+    		font-weight: normal;
+    		font-style: normal;
+		}
+		@font-face {
+    		font-family: 'pixel_arial_11regular';
+    		src: url('fontsquirrel_arialPREG/pixearg_-webfont.eot');
+    		src: url('fontsquirrel_arialPREG/pixearg_-webfont.eot?#iefix') format('embedded-opentype'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.woff2') format('woff2'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.woff') format('woff'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.ttf') format('truetype'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.svg#pixel_arial_11regular') format('svg');
+    		font-weight: normal;
+    		font-style: normal;
+		}
+		
+		body{
+			background: url("images/VOID/IMG_CREDITSWINDOW_FILL_02.gif") no-repeat center center fixed;
+			background-size: cover;
+			
+			image-rendering: pixelated;
+			image-rendering: crisp-edges;
+			
+			font-smooth: never;
+			-webkit-font-smoothing: none;
+			
+			font-size: 16px;
+		}
+		
+		
+		
+		#_backgroundOverlay{
+			position: fixed;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+			background: url("images/VOID/IMG_VOID_BACKGROUND_03.gif") no-repeat center center fixed;
+			background-size: cover;
+		}
+		
+		
+		#_screamWindow{
+			position: absolute;
+			
+			width: 434px;
+  			height: 178px;
+  			
+			
+			top: 50%;
+			left: 50%;
+			
+			margin: -70px 0 0 -170px;
+		}
+		
+				#_window_title{
+			position: absolute;
+			font-size: 11px;
+			top: 4px;
+			left: 6px;
+			color: white;
+			font-family: 'pixel_arial_11bold', Helvetica, Arial, "sans-serif";
+		}
+		
+		#input_scream{
+			position: absolute;
+			font-size: 16px;
+			
+			text-align: center;
+			
+			font-family: 'pixel_arial_11regular', Helvetica, Arial, "sans-serif";
+			
+			top: 80px;
+			left: 80px;
+		}
+		
+		#_window_text{
+			position: absolute;
+			font-size: 14px;
+			font-family: 'pixel_arial_11regular', Helvetica, Arial, "sans-serif";
+			text-align:center;
+			width: 434px;
+			top: 40px;
+			/*left: 80px;*/
+		}
+		
+		#_window_buttons{
+			position: absolute;
+			top: 124px;
+			left: 6px;
+		}
+		
+		#_btn_submit, #_btn_silence{
+			cursor: pointer;
+		}
+		
+		#_btn_submit:hover{
+			content: url("images/VOID/IMG_BTN_SUBMIT_PRESS.png");
+		}
+		#_btn_silence:hover{
+			content: url("images/VOID/IMG_BTN_SILENCE_PRESS.png");
+		}
+		
+		#_voidGift{
+			position:absolute;
+			
+			/*background:#C6C3C6;*/
+			background-image: url("images/VOID/IMG_DDRIVE_VIDEO_BACK.gif");
+			background-size: cover;
+			
+			border: 3px solid #848284;
+			box-shadow: 5px 5px black;
+			top: 10px;
+			left: 10px;
+			
+			width: 378px;
+			height: 417px;
+			
+			visibility: hidden;
+		}
+		
+		#_award_text{
+			font-size: 14px;
+			font-family: 'pixel_arial_11regular', Helvetica, Arial, "sans-serif";
+			padding: 5px;
+		}
+		
+	</style>
+	
+	<script>
+		
+		var arr_screams = ["AUD_AAAH_19.mp3", "AUD_AAAH_01.mp3", "AUD_AAAH_02.mp3", "AUD_AAAH_03.mp3", "AUD_AAAH_04.mp3", "AUD_AAAH_05.mp3", "AUD_AAAH_06.mp3", "AUD_AAAH_07.mp3", "AUD_AAAH_08.mp3", "AUD_AAAH_09.mp3", "AUD_AAAH_10.mp3", "AUD_AAAH_11.mp3", "AUD_AAAH_12.mp3", "AUD_AAAH_13.mp3", "AUD_AAAH_14.mp3", "AUD_AAAH_15.mp3", "AUD_AAAH_16.mp3", "AUD_AAAH_17.mp3", "AUD_AAAH_18.mp3", "AUD_AAAH_20.mp3", "AUD_AAAH_21.mp3", "AUD_AAAH_22.mp3", "AUD_AAAH_23.mp3", "AUD_AAAH_24.mp3", "AUD_AAAH_25.mp3", "AUD_AAAH_26.mp3", "AUD_AAAH_27.mp3", "AUD_AAAH_28.mp3", "AUD_AAAH_29.mp3", "AUD_AAAH_30.mp3", "AUD_AAAH_31.mp3", "AUD_AAAH_32.mp3", "AUD_AAAH_33.mp3", "AUD_AAAH_34.mp3", "AUD_AAAH_35.mp3", "AUD_AAAH_36.mp3", "AUD_AAAH_37.mp3", "AUD_AAAH_38.mp3", "AUD_AAAH_39.mp3", "AUD_AAAH_40.mp3", "AUD_AAAH_41.mp3", "AUD_AAAH_42.mp3", "AUD_AAAH_43.mp3", "AUD_AAAH_44.mp3", "AUD_AAAH_45.mp3", "AUD_AAAH_46.mp3", "AUD_AAAH_47.mp3", "AUD_AAAH_48.mp3", "AUD_AAAH_49.mp3", "AUD_AAAH_50.mp3", "AUD_AAAH_51.mp3", "AUD_AAAH_52.mp3", "AUD_AAAH_53.mp3", "AUD_AAAH_54.mp3", "AUD_AAAH_55.mp3"];
+		
+		var arr_str_silence = ["The Void is pleased with your silence.", "The Void accepts your silence.", "The Void accepts the silence.", "Silence resonates throughout the Void.", "Your silence pleases the Void.", "The Void is pleased by your silence.", "This pleases the Void.", "The Void consumes your silence.", "Your silence feeds the Void.", "Your silence greatly pleases the Void."];
+		
+		var arr_str_screamSuccess = ["The Void undulates.", "The Void accepts your screams.", "The Void embraces your cries.", "The Void undulates. It is pleased.", "Your screams have been heard by the Void.", "Your screams will never be enough, the Void wants more.", "The Void wants more.", "The Void is pleased by your cries.", "The Void resonates with your cries.", "The Void resonates with your screams.", "The Void consumes your screams.", "The Void consumes.", "The Void embraces your cries.", "It will never be enough. The Void wants more.", "The Void requires more.", "Yes... It was a good scream.", "Yes... The Void accepts your scream.", "The Void is pleased.", "This pleases the Void."];
+		
+		var arr_str_errors = ["Error: You did not scream.", "Error: The void requires a scream.", "Error: Please input a scream.", "Error: There was no scream.", "Error: No scream present."];
+		
+		var num_screamCount = 0;
+		
+		function playScream(){
+			//var snd = new Audio("SOUND/VOID/" + arr_screams[Math.ceil(Math.random()*arr_screams.length)-1]);
+			//snd.play();
+			
+			var snd = document.createElement('audio');
+			var snd_url = "SOUND/VOID/" + arr_screams[Math.ceil(Math.random()*arr_screams.length)-1];
+			snd.setAttribute('src', snd_url);
+			document.body.appendChild(snd);
+			snd.play();
+		}
+		
+		function reward(){
+			//count up
+			//The Void is pleased. It rewards you.
+			//if done play AUD_CALCULATOR_TADA_01.mp3
+			//and show award
+			
+			num_screamCount+=1;
+			//
+			if(num_screamCount == 4){
+				document.getElementById("_voidGift").style.visibility = "visible";
+				document.getElementById("_window_text").innerHTML = "The Void is pleased. It rewards you.";
+				var snd = new Audio("SOUND/VOID/AUD_CALCULATOR_TADA_01.mp3");
+				snd.play();
+			}
+		}
+		
+		function scream(){
+			
+			
+			//play sound
+			//clear text
+			//update body text and window title text...
+			
+			if(document.getElementById("input_scream").value.length > 0){
+				//clear
+				document.getElementById("input_scream").value = "";
+				document.getElementById("_window_text").innerHTML = arr_str_screamSuccess[Math.ceil(Math.random()*arr_str_screamSuccess.length)-1];
+				//
+				playScream();
+				//check...
+				reward();
+				
+			}else{
+				//error, no scream present
+				document.getElementById("_window_text").innerHTML = arr_str_errors[Math.ceil(Math.random()*arr_str_errors.length)-1];
+				//
+				var snd = new Audio("SOUND/VOID/AUD_ESSAY03_ERROR_OS_01.mp3");
+				snd.play();
+			}
+			
+			
+		}
+		
+		function silence(){
+			console.log("click");
+			//update text
+			var allSnds = document.querySelectorAll('audio');
+			//stop and remove all sounds
+  			for (var i = 0; i < allSnds.length; i++) {
+    			allSnds[i].pause();
+    			allSnds[i].currentTime = 0;
+				document.body.removeChild(allSnds[i]);
+  			}
+			//change innerHTML for text...
+			document.getElementById("_window_text").innerHTML = arr_str_silence[Math.ceil(Math.random()*arr_str_silence.length)-1];
+			//
+			document.getElementById("input_scream").value = "";
+			//
+			//reward();
+		}
+		
+		function addScreamListeners(){
+			
+			document.getElementById("_btn_submit").addEventListener("click", function(){
+				scream();
+			})
+			
+			document.getElementById("_btn_silence").addEventListener("click", function(){
+				silence();
+			})
+			
+			document.getElementById("input_scream").addEventListener("keyup", function(event){
+				//enter = 13
+  				if (event.keyCode === 13) {
+					scream();	
+				}
+			})
+			
+		}
+		
+	</script>
+	
+</head>
+
+<body onload="addScreamListeners();">
+	
+	<div id="_backgroundOverlay"></div>
+	
+	<div id="_voidGift"><div id="_award_text">You have been granted an award for your hard work. Right click it & save as...</div><img src="images/VOID/VOID_AWARD.gif" alt="test"></div>
+	
+	<div id="_screamWindow">
+		<div id="_window_title">SCREAM INTO THE VOID</div>
+		<div id="_window_text">Please submit your scream...</div>
+		
+		<input value="" id="input_scream">
+		
+		<img src="images/VOID/IMG_WINDOW_VOID.gif" alt="Scream here.">
+		<div id="_window_buttons"><img id="_btn_submit" src="images/VOID/IMG_BTN_SUBMIT_OUT.png" alt="Submit this scream"><img id="_btn_silence" src="images/VOID/IMG_BTN_SILENCE_OUT.png" alt="Offer Silence"></div>
+	</div>
+	
+	
+	
+	
+</body>
+</html>
