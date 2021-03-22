@@ -1,0 +1,108 @@
+﻿/**
+* A single block in the tile.
+* @author Daniel J Lawhead
+* @version 0.09
+*/
+class tetrigeddon.TileBlock
+{
+	public var x:Number;
+	public var y:Number;
+	public var frame:Number;
+	
+	public function TileBlock()
+	{
+		this.x = 5;
+		this.y = 5;
+		
+		this.frame = Game.randomNumber(3, _global.NUM_BLOCK_GRAPHICS);//Math.floor(Math.random() * (_global.NUM_BLOCK_GRAPHICS - 2 + 1)) + 2;;
+	}
+	
+	public function rotate(originX:Number, originY:Number, doTest:Boolean):Boolean
+	{	
+		var offsetX:Number = this.x - originX;
+		var offsetY:Number = this.y - originY;
+		
+		if(offsetX == 0 && offsetY == 0)
+		{
+			return true;
+		}
+		
+		var xr:Number = offsetY;
+		var yr:Number = -offsetX;
+		
+		var nextX:Number = originX + xr;
+		var nextY:Number = originY + yr;
+		
+		if (doTest)
+		{
+			// Removed "nextY == 0 ||" because blocks shouldn't check for top of grid.
+			if (nextY == _global.NUM_BLOCKS_Y)
+			{
+				return false;
+			}
+			
+			if (nextX < _global.GRID_START_X || nextX > _global.GRID_END_X)
+			{
+				return false;
+			}
+		}
+		else
+		{
+			this.x = nextX;
+			this.y = nextY;
+		}
+		
+		return true;
+	}
+	
+	public function move(dir:String, doTest:Boolean):Boolean
+	{
+		if (doTest)
+		{
+			var nextX:Number = 0;
+			var nextY:Number = 0;
+
+			switch(dir)
+			{
+				case "down" :
+					nextY = this.y + 1;
+					nextX = this.x;
+					break;
+				case "left" : 
+					nextX = this.x - 1;
+					nextY = this.y;
+					break;
+				case "right" :
+					nextX = this.x + 1;
+					nextY = this.y;
+					break;
+			}
+			// Removed "nextY == 0 ||" because we don't need to check collision for top of grid.
+			if (nextY == _global.NUM_BLOCKS_Y)
+			{
+				return false;
+			}
+			if (nextX < _global.GRID_START_X || nextX > _global.GRID_END_X)
+			{
+				return false;
+			}
+			return true;
+		}
+		else
+		{
+			switch(dir)
+			{
+				case "down" :
+					this.y = this.y + 1;
+					break;
+				case "left" :
+					this.x = this.x - 1;
+					break;
+				case "right" :
+					this.x = this.x + 1;
+					break;
+			}
+		}
+		return true;
+	}
+}

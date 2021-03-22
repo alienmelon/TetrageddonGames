@@ -1,0 +1,77 @@
+﻿// Bird.as
+import tetrigeddon.Enemy;
+import tetrigeddon.display.Debris;
+/*
+ * A bird.
+ * @author Daniel J Lawhead
+ * @version 0.09
+ */
+class tetrigeddon.enemies.Bird extends Enemy
+{
+	function Bird()
+	{
+		super();
+		this.states.crash = -2;
+		this.states.fly = 1;
+		this.dir = 1;
+		this.x = Game.randomNumber(this.x, -10);
+		if (Game.randomNumber(0, 5) == 5)
+		{
+			this.dir = -1;
+			this.x = Game.randomNumber(20, 23);
+		}
+		this._score = 100;
+		this.movieClip = _root.attachMovie("bird" + Game.randomNumber(1, 4), "bird_" + id, _root.getNextHighestDepth());
+		this.movieClip.cacheAsBitmap = true;
+		this.movieClip.stop();
+		this.y = Game.randomNumber(5, 10);
+	}
+	
+	public function update():Void
+	{
+		// Reached end of screen.
+		if (this.x < -25 || this.x > 25)
+		{
+			this.movieClip.removeMovieClip();
+			Game.enemies.removeEnemy(this);
+			return;
+		}
+		
+		if (this.state == this.states.dead) return;
+		
+		// Bird is dead, so drop to the floor
+		if (this.state == this.states.crash)
+		{
+			var pf:Number = Math.floor(this.groundRow * (_global.BLOCK_SIZE + _global.BLOCK_SPACING));
+			this.movieClip.gotoAndStop("falling");
+			if (this.pixelY < pf || Game.tileGrid.grid[this.y + 1][this.x] > 0) 
+			{
+				this.pixelY += 30.5;
+			}
+			else
+			{
+				this.state = this.states.dead;
+				var d:Debris = new Debris();
+				d.symbol = "gibs";
+				d.spawn(Game.randomNumber(this.pixelX, this.pixelX + (Math.floor(Math.random() * 5))), this.pixelY);
+				this.movieClip.gotoAndPlay("hitground");
+				this.die();
+			}
+			return;
+		}
+		
+		// Bird is flying.
+		if (Game.tileGrid.grid[this.y][this.x + this.dir] == 0 || Game.tileGrid.grid[this.y][this.x + this.dir] == undefined)
+		{
+			this.state = this.states.fly;
+			this.movieClip.gotoAndPlay("fly");
+			this.pixelX += 10 * this.dir;
+		}
+		// Flies into block
+		else if(Game.tileGrid.grid[this.y][this.x + this.dir] > 0)
+		{
+			this.state = this.states.crash;
+			this.movieClip.gotoAndStop("falling");
+		}
+	}
+}

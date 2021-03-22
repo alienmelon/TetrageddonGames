@@ -1,0 +1,461 @@
+﻿import tetrigeddon.TileFigure;
+import tetrigeddon.TileBlock;
+import tetrigeddon.display.Debris;
+/** 
+Defines the main game grid where all the blocks are stored.
+@version 1.0.0
+*/
+class tetrigeddon.TileGrid
+{
+	public var timer:Number;
+	public var lastTime:Number;
+	public var gameState:String;
+	public var fullLine:Number;
+	public var downSpeed:Number;
+	public var grid:Array;
+	public var currentFigure:TileFigure;
+	private var dropInterval:Number;
+	private var forcedDrop:Boolean;
+	private var parentMC:MovieClip;
+	private var animateInterval:Number;
+	
+	public function TileGrid()
+	{
+		this.gameState = "normal";
+		this.fullLine = -1;
+		this.lastTime = 0;
+		this.forcedDrop = false;
+	}
+	
+	public function create(pmc:MovieClip):Void
+	{
+		if (pmc == undefined) 
+			this.parentMC = _root; 
+		else 
+			this.parentMC = pmc;
+
+		this.grid = new Array();
+		for (var i:Number = 0; i < _global.NUM_BLOCKS_Y; i++)
+		{
+			this.grid.push(new Array());
+			for (var j:Number = 0; j < _global.NUM_BLOCKS_X; j++)
+			{
+				this.grid[i][j] = undefined;
+				if (j >= _global.GRID_START_X && j <= _global.GRID_END_X)
+				{
+					this.grid[i][j] = 0;
+					var mc:MovieClip = this.parentMC.attachMovie("blocks", "block" + i + "_" + j, this.parentMC.getNextHighestDepth());
+					mc.cacheAsBitmap = true;
+					mc._x = j * _global.BLOCK_SIZE + _global.BLOCK_SPACING;
+					mc._y = i * _global.BLOCK_SIZE + _global.BLOCK_SPACING;
+					mc.gotoAndStop(1);
+				}
+			}
+		}
+	}
+
+	public function destroy():Void
+	{
+		delete this.grid;
+		delete this.currentFigure;
+		clearInterval(dropInterval);
+		clearInterval(animateInterval);
+		for (var i:Number = 0; i < _global.NUM_BLOCKS_Y; i++)
+		{
+			for (var j:Number = 0; j < _global.NUM_BLOCKS_X; j++)
+			{
+				this.parentMC["block" + i + "_" + j].removeMovieClip();
+			}
+		}
+	}
+	
+	// Moves this.currentFigure down, checks if it "dropped," removes it, checks for full 
+	// rows, removes full rows, triggers all other lines to shift down, 
+	// and creates a new random figure.
+	public function progressGame():Void
+	{
+		// Check if game is paused.
+		if (this.gameState == "paused" || this.gameState == "stacked") // || this.gameState == "dropping")
+		{
+			return;
+		}
+		else if (this.gameState == "normal")
+		{
+			var currentTime:Number = getTimer();
+			//if (currentTime - this.lastTime >= this.downSpeed || this.forcedDrop)
+			if (currentTime - this.lastTime >= this.downSpeed)
+			{
+				// Check if block dropped.
+				if (move("down", true) == false)
+				{
+					this.forcedDrop = false;
+					// Set all blocks in current figure to be safe for enemies to interact with.
+					for (var i:Number = 0; i != this.currentFigure.blocks.length; i++)
+					{
+						this.currentFigure.blocks[i].isPlayerBlock = false;
+					}
+					// Check if any block stacked to top of grid.
+					for (var i:Number = 0; i != _global.NUM_BLOCKS_X; i++)
+					{
+						if (this.grid[0][i] > 0)
+						{
+							this.gameState = "stacked";
+							clearGrid();
+							return;
+						}
+					}
+					
+					for (var i:Number = 0; i < _global.NUM_BLOCKS_Y; i++)
+					{
+						if (isLineFull(i))
+						{
+							this.fullLine = i;
+							this.gameState = "eliminatingLine";
+							var s:Sound = new Sound();
+							s.attachSound("block_row_destroy.mp3");
+							s.start();
+							break;
+						}
+					}
+					
+					if(this.fullLine == -1)
+					{
+						var s:Sound = new Sound();
+						s.attachSound("block_land.mp3");
+						s.start();
+						createNewFigure();
+					}
+					
+					//this.currentFigure.destroy();
+					//delete this.currentFigure;
+				}
+				else
+				{
+					move("down", false);
+				}
+				this.lastTime = currentTime;
+			}
+		}
+		
+		if (this.gameState == "eliminatingLine")
+		{
+			if (animateLine(this.fullLine))
+			{
+				for (var i:Number = 0; i < _global.NUM_BLOCKS_X; i++)
+				{
+					this.grid[this.fullLine][i] = 0;
+					Game.playerScore.addScore(100);
+				}
+				shiftLines(this.fullLine);
+				this.gameState = "normal";
+				this.fullLine = -1;
+			}
+		}
+		draw();
+	}
+	
+	// Moves this.currentFigure.
+	public function move(dir:String, moveTest:Boolean):Boolean
+	{
+		if (this.currentFigure == undefined)
+		{
+			return false;
+		}
+		
+		if (moveTest)
+		{
+			// Check if figure will leave grid.
+			if (!this.currentFigure.move(dir, true))
+			{
+				return false;
+			}
+			else
+			{
+				var tmp:TileFigure = new TileFigure();
+				tmp.create(this.currentFigure.currentShape);
+				
+				for (var i:Number = 0; i < this.currentFigure.blocks.length; i++)
+				{
+					tmp.getBlockByIndex(i).x = this.currentFigure.getBlockByIndex(i).x;
+					tmp.getBlockByIndex(i).y = this.currentFigure.getBlockByIndex(i).y;
+				}
+				
+				tmp.move(dir, false);
+				
+				var allGood:Boolean = true;
+				for (var i:Number = 0; i < tmp.blocks.length; i++)
+				{
+					var blockAtX:Number = tmp.getBlockByIndex(i).x;
+					var blockAtY:Number = tmp.getBlockByIndex(i).y;
+					
+					if (this.currentFigure.getBlock(blockAtX, blockAtY) == undefined)
+					{
+						if (this.grid[blockAtY][blockAtX] > 0)
+						{
+							return false;
+						}
+					}
+				}
+				
+				delete tmp;
+			}
+		}
+		else
+		{
+			mapFigure(this.currentFigure, false);
+			this.currentFigure.move(dir, false);
+			mapFigure(this.currentFigure, true);
+		}
+		return true;
+	}
+	
+	// Drops block to bottom of game grid.
+	public function drop():Void
+	{
+		/* DEBUG: infinite loop! *
+		while (move("down", true))
+		{
+			move("down", false);
+		}
+		*/
+		//this.forcedDrop = true;
+		//progressGame();
+		if (this.gameState != "dropping") {
+			this.gameState = "dropping";
+			this.dropInterval = setInterval(this, "dropFigureDown", 10);
+		}
+	}
+	
+	private function dropFigureDown():Void
+	{
+		if (move("down", true))
+		{
+			move("down", false);
+			draw();
+		}
+		else
+		{
+			clearInterval(this.dropInterval);
+			this.gameState = "normal";
+			Game.shake(_root);
+			if (_root.mainAudioLoopStarted == false) {
+				_root.menuLoop.stop();
+				_root.menuLoop.attachSound("game_loop.wav");
+				_root.menuLoop.start(0,9999);
+				_root.mainAudioLoopStarted = true;
+			}
+			var s:Sound = new Sound();
+			s.attachSound("block_bash.mp3");
+			s.start();
+			this.dropInterval = undefined;
+		}
+	}
+	
+	// Rotates this.currentFigure.
+	public function rotate(moveTest:Boolean):Boolean
+	{
+		if (this.currentFigure == undefined)
+		{
+			return false;
+		}
+		
+		if (moveTest)
+		{
+			if (!this.currentFigure.rotate(true))
+			{
+				return false;
+			}
+			
+			var tmp:TileFigure = new TileFigure();
+			tmp.create(this.currentFigure.currentShape);
+			
+			for (var i:Number = 0; i < this.currentFigure.blocks.length; i++)
+			{
+				tmp.getBlockByIndex(i).x = this.currentFigure.getBlockByIndex(i).x;
+				tmp.getBlockByIndex(i).y = this.currentFigure.getBlockByIndex(i).y;
+			}
+			
+			tmp.rotate(false);
+			
+			for (var i:Number = 0; i < tmp.blocks.length; i++)
+			{
+				var blockAtX:Number = tmp.getBlockByIndex(i).x;
+				var blockAtY:Number = tmp.getBlockByIndex(i).y;
+				
+				if (this.currentFigure.getBlock(blockAtX, blockAtY) == undefined)
+				{
+					if (this.grid[blockAtY][blockAtX] > 0)
+					{
+						return false;
+					}
+				}
+			}
+		}
+		else
+		{
+			this.mapFigure(this.currentFigure, false);
+			this.currentFigure.rotate(false);
+			this.mapFigure(this.currentFigure, true);
+		}
+			
+		return true;
+	}
+	
+	// Maps Figure instance to grid.
+	private function mapFigure(figure:TileFigure, assign:Boolean):Void
+	{
+		for (var i:Number = 0; i < figure.blocks.length; i++)
+		{
+			if (assign)
+			{
+				if (figure.getBlockByIndex(i) != undefined)
+				{
+					this.grid[figure.getBlockByIndex(i).y][figure.getBlockByIndex(i).x] = figure.getBlockByIndex(i).frame;
+				}
+			}
+			else
+			{
+				if (figure.getBlockByIndex(i) != undefined)
+				{
+					this.grid[figure.getBlockByIndex(i).y][figure.getBlockByIndex(i).x] = 0;
+				}
+			}
+		}
+		draw();
+	}
+	
+	// Creates new random Figure instance.
+	public function createNewFigure():Void
+	{
+		var shapes = new Array("i", "o", "s", "z", "l", "j", "t", "wtf");
+		var figure:TileFigure = new TileFigure();
+		
+		var ran:Number = Math.floor(Math.random() * (Game.randomNumber(shapes.length - 1, shapes.length)));
+		figure.create(shapes[ran]);
+		
+		this.currentFigure = figure;
+		mapFigure(this.currentFigure, true);
+		Game.resetSpeed();
+	}
+	
+	// Checks if full row is present in grid.
+	private function isLineFull(line:Number):Boolean
+	{
+		if (line < 0) return false;
+		
+		for (var i:Number = _global.GRID_START_X; i != _global.GRID_END_X; i++)
+		{
+			if (this.grid[line][i] == 0)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	// Shifts all lines down by 1 row.
+	private function shiftLines(line:Number):Void
+	{
+		for (var i:Number = line; i != -1; i--)
+		{
+			for (var j:Number = 0; j != _global.NUM_BLOCKS_X; j++)
+			{
+				if (i == 0) return; // Can't shift lines above 0 down.
+				
+				this.grid[i][j] = this.grid[i - 1][j];
+				this.grid[i - 1][j] = 0;
+			}
+		}
+	}
+	
+	// Animates destruction of a full line.
+	private function animateLine(line:Number):Boolean
+	{
+		var d:Debris = new Debris();
+		var i:Number = 0;
+		var intrvl:Number = -1;
+		d.symbol = "rubble";
+		function explodeBlock():Void
+		{
+			trace("<<TileGrid::animateLine>> Animating \"block " + i + "_" + line + "\"");
+			var mc:MovieClip = this.parentMC["block" + i + "_" + line];
+			if (mc == undefined) 
+			{
+				trace("<<TileGrid::animateLine[383]>> Done animating line.");
+				clearInterval(intrvl);
+				return;
+			}
+			trace("<<TileGrid::animateLine[387]>> Animating " + mc + ".");
+			d.spawn(mc._x, mc._y, 1);
+			i++;
+		}
+		intrvl = setInterval(explodeBlock, 300);
+		/* Remove *
+		for (var i:Number = 0; i < _global.NUM_BLOCKS_X; i++)
+		{
+			trace("<<TileGrid::animateLine>> Spawning debris from " + this.parentMC["block" + line + "_" + i]._x);
+			d.spawn(this.parentMC["block" + line + "_" + i]._x, this.parentMC["block" + line + "_" + i]._y, 2);
+		}
+		*/
+		return true;
+	}
+	
+	// Updates MovieClips based on grid.
+	public function draw():Void
+	{
+		for (var i:Number = 0; i < _global.NUM_BLOCKS_Y; i++)
+		{
+			for (var j:Number = 0; j < _global.NUM_BLOCKS_X; j++)
+			{
+				if (this.grid[i][j] > 0)
+				{
+					this.parentMC["block" + i + "_" + j].gotoAndStop(this.grid[i][j]);
+				}
+				else
+				{
+					this.parentMC["block" + i + "_" + j].gotoAndStop(1);
+				}
+			}
+		}
+	}
+	
+	/**
+	* Clears the grid.
+	*/
+	private function clearGrid():Void
+	{
+		var d:Debris = new Debris();
+		d.symbol = "rubble";
+		for (var yi:Number = 0; yi <= _global.NUM_BLOCKS_Y; yi++)
+		{
+			for (var xi:Number = _global.GRID_START_X; xi <= _global.GRID_END_X; xi++)
+			{
+				if (this.grid[yi][xi] > 0)
+				{
+					d.spawn(this.parentMC["block" + yi + "_" + xi]._x, this.parentMC["block" + yi + "_" + xi]._y, 2);
+					this.grid[yi][xi] = 0;
+				}
+			}
+		}
+		this.draw();
+		this.gameState = "normal";
+		Game.shake(_root);
+		Game.shake(_root.mc_cityscape, 2);
+		Game.shake(_root.mc_cityscape2, 4);
+		Game.playerScore.takeScore(500);
+	}
+	
+	/**
+	* (Deprecated; do not use!) Returns true or false depending on whether a cell is free.
+	* @param	cx	X coordinate of cell.
+	* @param	cy	Y coordinate of cell.
+	* @return	True if cell has a block in it, or false otherwise.
+	*/
+	public function isFull(cx:Number, cy:Number):Boolean
+	{
+		if (Game.tileGrid.grid[cy][cx] > 0 && Game.tileGrid.grid[cy][cx] != undefined)
+			return true;
+		else if (Game.tileGrid.grid[cy][cx] == 0 && Game.tileGrid.grid[cy][cx] != undefined)
+			return false;
+	}
+}

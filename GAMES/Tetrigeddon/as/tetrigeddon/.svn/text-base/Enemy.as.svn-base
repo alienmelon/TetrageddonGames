@@ -1,0 +1,196 @@
+﻿// the_tetrigeddon-0.09\as\tetrigeddon\Enemy.as
+import tetrigeddon.display.ComicBubble;
+
+/**
+* An enemy that interacts with the player's block stack.
+* @author Daniel J Lawhead
+* @version 0.09.1
+*/
+class tetrigeddon.Enemy
+{
+	/**
+	* UID assinged to Enemy by EnemyManager.
+	*/
+	public var id:Number;
+	
+	/**
+	* Graphical representation of Enemy.
+	*/
+	private var movieClip:MovieClip;
+	
+	/**
+	* State of the enemy.
+	*/
+	public var state:Number;
+	
+	/**
+	* Current horizontal position in grid units.
+	*/
+	private var _curX:Number;
+	
+	/**
+	 * Current vertical position in grid units.
+	 */
+	private var _curY:Number;
+	
+	/**
+	* Different Enemy states.
+	*/
+	private var states:Object;
+	
+	/**
+	* Direction enemy is facing.
+	*/
+	private var dir:Number;
+	
+	/**
+	* Minimum distance enemy may travel vertically
+	*/
+	private var groundRow:Number;
+	
+	/**
+	 * Score recieved by killing this enemy.
+	 */
+	private var _score:Number;
+	
+	/**
+	 * Sound attached when enemy dies.
+	 */
+	private var deathSound:String;
+	
+	/**
+	* Basic enemy which slowly walks back and forth.
+	*/
+	public function Enemy()
+	{
+		this.states = new Object();
+		this.states.dead = -1;
+		this.states.idle = 0;
+		
+		this.groundRow = this.y = 15; // Floor. Concrete.
+		
+		this._curX = 0;
+		this._curY = 0;
+		
+		this._score = 0;
+		this.deathSound = "line" + Game.randomNumber(1, 28)
+	}
+	
+	/**
+	* Gets current horizontal position in grid units.
+	* @return	Horizontal position in grid units.
+	*/
+	public function get x():Number
+	{
+		return this._curX;
+	}
+	
+	/**
+	* Sets current horizontal position in grid units.
+	* @param	n	New horizontal position in grid units.
+	*/
+	public function set x(n:Number):Void
+	{
+		this._curX = n;
+		this.movieClip._x = Math.floor(this._curX * (_global.BLOCK_SIZE + _global.BLOCK_SPACING));
+	}
+	
+	/**
+	* Gets current vertical position in grid units.
+	* @return	Vertical position in grid units.
+	*/
+	public function get y():Number
+	{
+		return this._curY;
+	}
+	
+	/**
+	* Sets current vertical position in grid units.
+	* @param	n	New vertical position in grid units.
+	*/
+	public function set y(n:Number):Void
+	{
+		this._curY = n;
+		this.movieClip._y = Math.floor(this._curY * (_global.BLOCK_SIZE + _global.BLOCK_SPACING));
+	}
+	
+	/**
+	* Returns current X position in pixels.
+	* @return	Current X position.
+	*/
+	public function get pixelX():Number
+	{
+		return this.movieClip._x;
+	}
+	
+	/**
+	* Sets current X position.
+	* @param	n	New X position in pixels.
+	*/
+	public function set pixelX(n:Number):Void
+	{
+		this.movieClip._x = n;
+		this._curX = Math.floor(this.movieClip._x / (_global.BLOCK_SIZE + _global.BLOCK_SPACING));
+	}
+	
+	/**
+	* Returns current Y position in pixels.
+	* @return	Current Y position.
+	*/
+	public function get pixelY():Number
+	{
+		return this.movieClip._y;
+	}
+	
+	/**
+	* Sets current Y position.
+	* @param	n	Y position in pixels.
+	*/
+	public function set pixelY(n:Number):Void
+	{
+		this.movieClip._y = n;
+		this._curY = Math.floor(this.movieClip._y / (_global.BLOCK_SIZE + _global.BLOCK_SPACING));
+	}
+	
+	/**
+	 * Tiggers collision check, updates state, toggles appropriate animation and movement.
+	 */
+	public function update():Void
+	{
+		throw new Error("<<Enemy.update()>> Requires implementation before use!!");
+	}
+	
+	/**
+	 * Gets points this enemy is worth.
+	 * @returns Scoring points of enemy.
+	 */
+	public function get score():Number
+	{
+		return _score;
+	}
+	
+	private function die():Void
+	{
+		this.state = this.states.dead;
+		Game.playerScore.addScore(this.score);
+		var b:ComicBubble = new ComicBubble(pixelX + Game.randomNumber(-10, 10), pixelY - Game.randomNumber(50, 80), "onomatopoeia");
+		if (Game.randomNumber(1, 2) == 2 && !_root.startedCommentary) {
+			_root.mc_commentary.gotoAndPlay(this.deathSound);
+			_root.mc_commentaryani.play();
+			_root.startedCommentary = true;
+		}
+		this.movieClip.onEnterFrame = function() {
+			this._alpha -= 0.5;
+			if (this._alpha <= 0) {
+				this.removeMovieClip();
+			}
+		}
+		if (_root.mainAudioLoopStarted == false) {
+			_root.menuLoop.stop();
+			_root.menuLoop.attachSound("game_loop.wav");
+			_root.menuLoop.start(0,9999);
+			_root.mainAudioLoopStarted = true;
+		}
+		Game.enemies.removeEnemy(this);
+	}
+}

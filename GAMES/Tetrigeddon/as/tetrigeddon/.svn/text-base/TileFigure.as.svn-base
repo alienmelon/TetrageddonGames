@@ -1,0 +1,228 @@
+﻿/* 
+the_tetrigeddon-0.09\as\tetrigeddon\TileFigure.as
+*/
+
+import tetrigeddon.TileBlock;
+import tetrigeddon.display.ComicBubble;
+
+/**
+* Represents a grid figure.
+* @author Daniel J Lawhead
+* @version 0.09
+*/
+class tetrigeddon.TileFigure
+{
+	public var blocks:Array;
+	private var _curShape:String;
+
+	public function TileFigure()
+	{
+		this._curShape = "";
+	}
+	
+	// Creates shape. Values "l", "o", "s", or "z" can be passed in.
+	public function create(shape:String):Void
+	{
+		this.blocks = new Array(4);
+		
+		var halfWidth:Number = Math.ceil(_global.NUM_BLOCKS_X / 2);
+
+		for (var i:Number = 0; i < 4; i++)
+		{
+			this.blocks[i] = new TileBlock();
+		}
+		
+		this._curShape = shape;
+		
+		switch (shape.toLowerCase())
+		{
+			case "i":
+				this.blocks[0].x = halfWidth;
+				this.blocks[0].y = -3;
+				this.blocks[1].x = halfWidth;
+				this.blocks[1].y = -4;
+				this.blocks[2].x = halfWidth;
+				this.blocks[2].y = -2;
+				this.blocks[3].x = halfWidth;
+				this.blocks[3].y = -1;
+				break;
+			case "o":
+				this.blocks[0].x = halfWidth - 1;
+				this.blocks[0].y = -2;
+				this.blocks[1].x = halfWidth;
+				this.blocks[1].y = -2;
+				this.blocks[2].x = halfWidth - 1;
+				this.blocks[2].y = -1;
+				this.blocks[3].x = halfWidth;
+				this.blocks[3].y = -1;
+				break;
+			case "s":
+				this.blocks[0].x = halfWidth;
+				this.blocks[0].y = -2;
+				this.blocks[1].x = halfWidth;
+				this.blocks[1].y = -1;
+				this.blocks[2].x = halfWidth + 1;
+				this.blocks[2].y = -2;
+				this.blocks[3].x = halfWidth - 1;
+				this.blocks[3].y = -1;
+				break;
+			case "z":
+				this.blocks[0].x = halfWidth;
+				this.blocks[0].y = -2;
+				this.blocks[1].x = halfWidth;
+				this.blocks[1].y = -1;
+				this.blocks[2].x = halfWidth - 1;
+				this.blocks[2].y = -2;
+				this.blocks[3].x = halfWidth + 1;
+				this.blocks[3].y = -1;
+				break;
+			case "l":
+				this.blocks[1].x = halfWidth;
+				this.blocks[1].y = -4;
+				this.blocks[0].x = halfWidth;
+				this.blocks[0].y = -3;
+				this.blocks[2].x = halfWidth;
+				this.blocks[2].y = -2;
+				this.blocks[3].x = halfWidth + 1;
+				this.blocks[3].y = -2;
+				break;
+			case "j":
+				this.blocks[1].x = halfWidth;
+				this.blocks[1].y = -4;
+				this.blocks[0].x = halfWidth;
+				this.blocks[0].y = -3;
+				this.blocks[2].x = halfWidth;
+				this.blocks[2].y = -2;
+				this.blocks[3].x = halfWidth - 1;
+				this.blocks[3].y = -2;
+				break;
+			case "t":
+				this.blocks[0].x = halfWidth;
+				this.blocks[0].y = -2;
+				this.blocks[1].x = halfWidth;
+				this.blocks[1].y = -1;
+				this.blocks[2].x = halfWidth - 1;
+				this.blocks[2].y = -2;
+				this.blocks[3].x = halfWidth + 1;
+				this.blocks[3].y = -2;
+				break;
+			case "wtf":
+				if (_root.onomatopoeia_supriseMC == undefined) {
+					var bub:ComicBubble = new ComicBubble(Stage.width / 2, Stage.height / 2, "onomatopoeia_suprise");
+					/*
+					block4.mp3
+					block5.mp3
+					suprise2.mp3
+					suprise3.mp3
+					*/
+					var s:Sound = new Sound();
+					var id:String = "block" + Game.randomNumber(4, 5) + ".mp3";
+					var id2:String = "suprise" + Game.randomNumber(2, 3) + ".mp3";
+					if (Game.randomNumber(0, 1) == 1) {
+						s.attachSound(id2);
+					} else {
+						s.attachSound(id);
+					}
+					s.start();
+				}
+				this.blocks[0].x = Game.randomNumber(halfWidth + 3, halfWidth - 3);
+				this.blocks[0].y = Game.randomNumber(0, -4);
+				this.blocks[1].x = Game.randomNumber(halfWidth + 3, halfWidth - 3);
+				this.blocks[1].y = Game.randomNumber(0, -4);
+				this.blocks[2].x = Game.randomNumber(halfWidth + 3, halfWidth - 3);
+				this.blocks[2].y = Game.randomNumber(0, -4);
+				this.blocks[3].x = Game.randomNumber(halfWidth + 3, halfWidth - 3);
+				this.blocks[3].y = Game.randomNumber(0, -4);
+				break;
+		}
+	}
+	
+	// Destroy all TileBlock instances in this.blocks and destroy this.
+	public function destroy():Void
+	{
+		for (var i:Number = 0; i < this.blocks.length; i++)
+		{
+			delete this.blocks[i];
+		}
+	}
+	
+	// Rotates block in direction dir. If doTest is true, only hit detection takes place.
+	public function rotate(doTest:Boolean):Boolean
+	{
+		if (doTest)
+		{
+			for (var i:Number = 0; i < this.blocks.length; i++)
+			{
+				if (!this.blocks[i].rotate(this.blocks[0].x, this.blocks[0].y, true))
+				{
+					var s:Sound = new Sound();
+					s.attachSound("block_land.mp3");
+					s.start();
+					return false;
+				}
+			}
+		}
+		else
+		{
+			for (var i:Number = 0; i < this.blocks.length; i++)
+			{
+				this.blocks[i].rotate(this.blocks[0].x, this.blocks[0].y, false);
+			}
+		}
+		return true;
+	}
+	
+	// Same as rotate, but moves instead of rotates.
+	public function move(dir:String, doTest:Boolean):Boolean
+	{
+		if (doTest)
+		{
+			for (var i:Number = 0; i < this.blocks.length; i++)
+			{
+				if(!this.blocks[i].move(dir, true))
+				{
+					var s:Sound = new Sound();
+					s.attachSound("block_land.mp3");
+					s.start();
+					return false;
+				}
+			}
+		}
+		else
+		{
+			for (var i:Number = 0; i < this.blocks.length; i++)
+			{
+				this.blocks[i].move(dir,false);
+			}
+		}
+		return true;
+	}
+	
+	// Gets block from this.blocks based on X/Y coordinates.
+	public function getBlock(xp:Number, yp:Number):TileBlock
+	{
+		for (var i:Number = 0; i < this.blocks.length; i++)
+		{
+			if (this.blocks[i].x == xp && this.blocks[i].y == yp)
+			{
+				return this.blocks[i];
+			}
+		}
+		return undefined;
+	}
+	
+	// Gets block from this.blocks based on array index.
+	public function getBlockByIndex(index:Number):TileBlock
+	{
+		if (index >= 0 && index < this.blocks.length)
+		{
+			return this.blocks[index];
+		}
+		return undefined;
+	}
+	
+	public function get currentShape():String
+	{
+		return this._curShape;
+	}
+}

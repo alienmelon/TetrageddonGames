@@ -1,0 +1,45 @@
+﻿// ComicBubble.as
+// v0.09
+
+/*
+ * Bubble that contains text.
+ * @author Daniel J. Lawhead
+ * @version v0.09
+ */
+class tetrigeddon.display.ComicBubble
+{
+	private var _mc:MovieClip;
+	private var _mcd:Array;
+	private var _id:Number;
+	private var _id2:Number;
+
+	function ComicBubble(X:Number, Y:Number, s:String)
+	{
+		_mc = null;
+
+		_mc = _root.attachMovie(s, s + "MC", _root.getNextHighestDepth());
+		_mc._x = X;
+		_mc._y = Y;
+		_mc.gotoAndStop(Game.randomNumber(1, 6));
+		_mcd = [_mc._width, _mc._height];
+
+		_id = setInterval(this, "bubbleUp", 10);
+		_id2 = setInterval(this, "remove", 500);
+		
+		// Attach audio commentary.
+	}
+
+	private function bubbleUp():Void
+	{
+		_mc._width = _mc._width * 0.9 + (-_mc._width + _mcd[0]) * 0.4;
+		_mc._height = _mc._height * 0.9 + (-_mc._height + _mcd[1]) * 0.4;
+		return;
+	}
+
+	private function remove():Void
+	{
+		clearInterval(_id);
+		clearInterval(_id2);
+		_mc.removeMovieClip();
+	}
+}

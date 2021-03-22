@@ -1,0 +1,113 @@
+﻿/* 
+the_tetrigeddon-0.09\as\tetrigeddon\EnemyManager.as
+*/
+
+import tetrigeddon.Enemy;
+import tetrigeddon.enemies.*;
+import com.meychi.ascrypt.*;
+
+/**
+* Creates, deletes, and moves enemies.
+* @author Daniel J Lawhead
+* @version 0.09
+*/
+class tetrigeddon.EnemyManager
+{
+	/**
+	* Array of Enemy instances.
+	*/
+	private var enemies:Array;
+	
+	/*
+	 * ID of last enemy.
+	 */
+	private var UID:Number;
+	
+	/**
+	* Number of enemies added.
+	*/
+	public var count:Number;
+	
+	public var max:Number;
+	
+	/**
+	* Manages all Enemy instances in the game.
+	*/
+	public function EnemyManager()
+	{
+		this.enemies = new Array();
+		UID = 0;
+		max = 10;
+	}
+	
+	public function addEnemy(id:Number):Void
+	{
+		if (this.enemies.length == max)
+		{
+			return;
+		}
+		
+		var e:Enemy = null;
+		switch (id)
+		{
+			case 1:
+				e = new Citizen();
+				break;
+			case 2:
+				e = new Bird();
+				break;
+		}
+		UID += 1;
+		e.id = UID;
+		this.enemies.push(e);
+	}
+	
+	public function removeEnemy(e:Enemy):Void
+	{
+		var i:Number = -1;
+		var temp:Array = new Array();
+		while (++i < this.enemies.length)
+		{
+			if (this.enemies[i].id == e.id)
+			{
+				this.enemies[i] = null;
+			}
+			if (this.enemies[i] != null || this.enemies[i] != undefined)
+			{
+				temp.push(this.enemies[i]);
+			}
+
+		}
+		this.enemies = temp;
+	}
+	
+	public function getEnemyAt(x:Number, y:Number):Enemy
+	{
+		var i:Number = -1;
+		while (++i < this.enemies.length)
+		{
+			if (enemies[i].x == x && enemies[i].y == y)
+			{
+				return enemies[i];
+			}
+		}
+		return undefined;
+	}
+	
+	public function update():Void
+	{
+		for (var i in this.enemies)
+		{
+			this.enemies[i].update();
+		}
+	}
+	
+	public function clear():Void
+	{
+		var i:Number = 0;
+		while (++i < this.enemies.length)
+		{
+			this.removeEnemy(this.enemies[i]);
+		}
+	}
+}

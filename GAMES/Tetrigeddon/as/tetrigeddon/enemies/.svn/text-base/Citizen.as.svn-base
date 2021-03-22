@@ -1,0 +1,235 @@
+﻿// the_tetrigeddon-0.09\as\tetrigeddon\enemies\Citizen.as
+import tetrigeddon.Enemy;
+import tetrigeddon.display.Debris;
+/**
+ * A 35 by 70 pixels human that attacks tiles, but does no harm to them.
+ * @version 0.09.1
+ */
+class tetrigeddon.enemies.Citizen extends Enemy
+{
+	private var walkSpeed:Number;
+	private var dir:Number;
+	private var aggressive:Boolean;
+	private var agile:Boolean;
+	private var jumpIDs:Array;
+	private var attackID:Number;
+	private var jumpSpeed:Number;
+	private var climbSpeed:Number;
+	
+	public function Citizen()
+	{
+		super();
+		this.walkSpeed = Game.randomNumber(2, 4);
+		this.states.walk = 1;
+		this.states.turn = 2;
+		this.states.attack = 3;
+		this.states.climb = 4;
+		this.states.jump = 5;
+		this.states.fall = 6;
+		var sym:String = "citizen" + Game.randomNumber(1, 6);
+		this.movieClip = _root.attachMovie(sym, "citizen_" + this.id, _root.getNextHighestDepth());
+		this.movieClip.cacheAsBitmap = true;
+		this.x = Game.randomNumber(this.x, -10);
+		this.y = this.groundRow;
+		this.dir = 1;
+		this.attackID = -1;
+		this._score = 300;
+		if (Game.randomNumber(1, 2) == 1)
+		{
+			this.dir = -1;
+			this.x = Game.randomNumber(20, 23);
+		}
+		if (Game.randomNumber(0, 3) == 3)
+		{
+			this.aggressive = true;
+		}
+		if (Game.randomNumber(0, 3) == 3)
+		{
+			this.agile = true;
+		}
+		this.jumpIDs = new Array();
+		this._score = 100;
+		switch (sym) {
+			case "citizen1":
+				jumpSpeed = 1200;
+				climbSpeed = 1500;
+				break;
+			case "citizen2" : 
+				jumpSpeed = 1200;
+				climbSpeed = 1500;
+			case "citizen3":
+				jumpSpeed = 800;
+				climbSpeed = 1800;
+				break;
+			case "citizen4":
+				jumpSpeed = 1000;
+				climbSpeed = 1200;
+				break;
+			case "citizen5":
+				jumpSpeed = 1000;
+				climbSpeed = 1000;
+				break;
+			case "citizen6":
+				jumpSpeed = 800;
+				climbSpeed = 1000;
+				break;
+			case "citizen7":
+				jumpSpeed = 500;
+				climbSpeed = 1100;
+				this.walkSpeed = Game.randomNumber(0.5, 1);
+				this.deathSound = "line29";
+				break;
+		}
+		this.state = this.states.walk;
+	}
+	
+	/**
+	 * Checks for possible collisions, and updates state & animation.
+	 * @see	EnemyManager.update()
+	 */
+	public function update():Void
+	{
+		// Check if update should be skipped.
+		if (this.state == this.states.dead)
+		{
+			return;
+		}
+		// Set initial state.
+		this.state = this.states.walk;
+		// Should citizen fall?
+		if (Game.tileGrid.grid[this.y + 1][this.x] == 0 || (Game.tileGrid.grid[this.y + 1][this.x] == undefined && this.y < this.groundRow))
+		{
+			this.state = this.states.fall;
+			this.y++;
+			return;
+		}
+		// Die
+		if (Game.tileGrid.grid[this.y - 1][this.x] > 0 || Game.tileGrid.grid[this.y][this.x] > 0)
+		{
+			var d:Debris = new Debris();
+			d.symbol = "gibs";
+			d.spawn(Game.randomNumber(this.pixelX, this.pixelX + (Math.floor(Math.random() * 5))), this.pixelY);
+			this.movieClip.gotoAndStop("die");
+			this.die();
+			return;
+		}
+		// Reached end of screen.
+		if (this.x < -10 || this.x > 25)
+		{
+			this.movieClip.removeMovieClip();
+			Game.enemies.removeEnemy(this);
+			return;
+		}
+		// Check what direction should sprite scale to.
+		if (dir == -1)
+		{
+			this.movieClip._xscale = -100;
+		} 
+		else if (dir == 1)
+		{
+			this.movieClip._xscale = 100;
+		}
+		// Check if citizen can walk around!
+		if ((Game.tileGrid.grid[this.y][this.x + this.dir] <= 0 && Game.tileGrid.grid[this.y - 1][this.x + this.dir] <= 0) || (Game.tileGrid.grid[this.y][this.x + this.dir] == undefined && Game.tileGrid.grid[this.y - 1][this.x + this.dir] == undefined))
+		{
+			this.state = this.states.walk;
+			this.movieClip.gotoAndStop("walk");
+			walk();
+
+		}
+		// Check if citizen can jump over the obstruction. Citizens can only jump over one block.
+		else if (Game.tileGrid.grid[this.y - 1][this.x + this.dir] == 0 && Game.tileGrid.grid[this.y - 2][this.x + this.dir] == 0 && this.agile)
+		{
+			this.state = this.states.jump;
+			this.movieClip.gotoAndStop("jump");
+			this.jumpIDs.push(setInterval(this, "position", jumpSpeed, [this.x + this.dir, this.y - 1]));
+		}
+		// Can citizen climb over obstruction?
+		else if (Game.tileGrid.grid[this.y - 2][this.x + this.dir] == 0 && Game.tileGrid.grid[this.y - 3][this.x + this.dir] == 0 && Game.tileGrid.grid[this.y - 1][this.x] && Game.tileGrid.grid[this.y - 2][this.x] && this.agile)
+		{
+			this.state = this.states.climb;
+			this.movieClip.gotoAndStop("climb");
+			this.jumpIDs.push(setInterval(this, "position", climbSpeed, [this.x + this.dir, this.y - 2]));
+		}
+		// Aggressive citizen
+		else if (this.aggressive)
+		{
+			this.state = this.states.attack;
+			this.movieClip.gotoAndStop("attack");
+			if (this.attackID == -1) this.attackID = setInterval(this, "destroyBlock", Game.randomNumber(3000, 5000));
+		}
+		// No where to go! OH GOD!
+		else if ((Game.tileGrid.grid[this.y - 1][this.x - this.dir] > 0 || Game.tileGrid.grid[this.y - 2][this.x - this.dir] > 0) && !this.aggressive && !this.agile)
+		{
+			this.state = this.states.idle;
+			this.movieClip.gotoAndStop("idle");
+		}
+		// Turn around.
+		else
+		{
+			this.dir *= -1;
+			this.state = this.states.turn;
+		}
+	}
+	
+	/*
+	 * Moves Citizen according to walking algorithm.
+	 */
+	private function walk():Void
+	{
+		this.pixelX += this.walkSpeed * this.dir;
+	}
+	
+	/*
+	 * Sets citizen's position to specified coordinates, <b>disregard of whether a block is there or not</b>. State is then set to 42 to kick off the update process. Used for positioning sprite after a jump or climb animation played through.
+	 * @param	pos	New coordinates. Indices 0 and 1 should be set to desired X and Y coordinates respectively.
+	 */
+	private function position(pos:Array):Void
+	{
+		if (this.state == this.states.jump || this.state == this.states.climb) {
+			this.x = pos[0];
+			this.y = pos[1];
+		}
+		for (var i:Number = 0; i != this.jumpIDs.length; i++)
+		{
+			clearInterval(this.jumpIDs[i]);
+		}
+		updateAfterEvent();
+		// Reset state.
+		//this.state = this.states.walk;
+	}
+	
+	/*
+	 * Moves Citizen according to falling algorithm.
+	 */
+	private function fall():Void
+	{
+		if (this.y < this.groundRow && Game.tileGrid.grid[this.y + 1][this.x] == 0) 
+			this.y++;
+		else
+			this.state = this.states.walk;
+	}
+	
+	/*
+	 * Destroys block directly infront of Citizen.
+	 */
+	private function destroyBlock()
+	{
+		clearInterval(this.attackID);
+		this.attackID = -1;
+		if (this.state != this.states.attack) return;
+		if (Game.tileGrid.grid[this.y - 1][this.x + this.dir] > 0) {
+			Game.tileGrid.grid[this.y - 1][this.x + this.dir] = 0;
+			Game.tileGrid.draw();
+			var d:Debris = new Debris();
+			d.symbol = "rubble";
+			d.spawn(this.pixelX +(_global.BLOCK_SIZE * this.dir), this.pixelY - _global.BLOCK_SIZE, 4);
+		} else if (Game.tileGrid.grid[this.y][this.x + this.dir] > 0) {
+			Game.tileGrid.grid[this.y][this.x + this.dir] = 0;
+			Game.tileGrid.draw();
+			var d:Debris = new Debris();
+			d.symbol = "rubble";
+			d.spawn(this.pixelX +(_global.BLOCK_SIZE * this.dir), this.pixelY, 4);
+		}
+	}
+}

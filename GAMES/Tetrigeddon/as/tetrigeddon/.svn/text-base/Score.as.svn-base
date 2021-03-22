@@ -1,0 +1,36 @@
+﻿// Score.as
+// v0.09
+/**
+ * Score keeper.
+ * @author Daniel J. Lawhead
+ * @version 0.09
+ */
+class tetrigeddon.Score
+{
+	private var _score:Number;
+	
+	public function Score()
+	{
+		_score = 0;
+	}
+	
+	public function addScore(n:Number):Void
+	{
+		_score += n;
+	}
+	
+	public function takeScore(n:Number):Void
+	{
+		_score -= n;
+	}
+	
+	public function getScore():Number
+	{
+		return _score;
+	}
+	
+	public function setScore(n:Number):Void
+	{
+		_score = n;
+	}
+}
