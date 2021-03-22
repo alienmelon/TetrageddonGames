@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Welcome To The ERROR ZONE</title>
+	
+	<style>
+		
+		@font-face {
+    		font-family: 'pixel_arial_11bold';
+    		src: url('fontsquirrel_arialPB/pixeab__-webfont.eot');
+    		src: url('fontsquirrel_arialPB/pixeab__-webfont.eot?#iefix') format('embedded-opentype'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.woff2') format('woff2'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.woff') format('woff'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.ttf') format('truetype'),
+         		url('fontsquirrel_arialPB/pixeab__-webfont.svg#pixel_arial_11bold') format('svg');
+    		font-weight: normal;
+    		font-style: normal;
+		}
+		@font-face {
+    		font-family: 'pixel_arial_11regular';
+    		src: url('fontsquirrel_arialPREG/pixearg_-webfont.eot');
+    		src: url('fontsquirrel_arialPREG/pixearg_-webfont.eot?#iefix') format('embedded-opentype'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.woff2') format('woff2'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.woff') format('woff'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.ttf') format('truetype'),
+         		url('fontsquirrel_arialPREG/pixearg_-webfont.svg#pixel_arial_11regular') format('svg');
+    		font-weight: normal;
+    		font-style: normal;
+		}
+		
+		body{
+			font-family: 'pixel_arial_11bold', Helvetica, Arial, "sans-serif";
+			background-image: url("images/BACKGROUND_05.gif");
+			background-repeat: no-repeat;
+    		background-position: center;
+    		background-size: cover;
+    		width: 100%;
+    		height:100vh;
+		}
+		
+		#audioContainer{
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+		#footer{
+			position: fixed;
+			color:black;
+			font-size: 30px;
+			text-align: center;
+			bottom: 30px;
+			left: 10px;
+			animation: bounce .3s infinite alternate;
+		}
+		#title{
+			position: fixed;
+			color:white;
+			font-size: 30px;
+			text-align: center;
+			margin-top: 30px;
+			margin-left: 50%;
+			animation: bounce .3s infinite alternate;
+		}
+		
+		
+		@keyframes bounce { 
+			from {
+    			transform: translateY(0px);
+			} to {
+				transform: translateY(-15px);
+			}
+		} 
+		
+	
+	</style>
+	
+	<script>
+		
+		var arr_errors = ["Error30.png", "Error29.png", "Error28.png", "Error26.png", "Error27.png", "Error24.png", "Error25.png", "Error20.png", "Error21.png", "Error22.png", "Error23.png", "Error16.png", "Error17.png", "Error18.png", "Error19.png", "Error13.png", "Error14.png", "Error09.png", "Error10.png", "Error11.png", "Error12.png", "Error06.png", "Error07.png", "Error08.png", "Error02.png", "Error03.png", "Error04.png", "Error05.png", "Error01.png"];
+		var arr_backgrounds = ["GENERIC_ERROR.gif", "ERROR_AH.gif", "ERROR_AAaaaH.gif", "ERROR_404.gif"];//, "BACKGROUND_05.gif", "BACKGROUND_01.gif"];
+		var intervalID;
+		var arr_appendedErrors = [];
+		var scrollSpeed = 1;
+		
+		//make image tag for innerHTML
+		function returnImage(str_imagename){
+			return '<img src=' + str_imageURL + str_imagename + ">"
+		}
+		//random array element
+		function returnArray(arr){
+			return arr[Math.ceil(Math.random()*arr.length)-1];
+		}
+		//document width and height
+		function returnDocWidth(){
+			var num_width = window.innerWidth
+			|| document.documentElement.clientWidth
+			|| document.body.clientWidth;
+			return num_width;
+		}
+		function returnDocHeight(){
+			var num_height = window.innerHeight
+			|| document.documentElement.clientHeight
+			|| document.body.clientHeight;
+			return num_height;
+		}
+		function randomRange(num_min, num_max){
+			return Math.ceil(num_min + (num_max - num_min) * Math.random());
+		}
+		
+		function makeError(){
+			var imgError = 'images/errors/' + returnArray(arr_errors);
+			var error = document.createElement("div");
+			error.innerHTML = "<img src=" + imgError + " alt='error'>";
+			document.getElementsByTagName("body")[0].appendChild(error);
+			arr_appendedErrors.push(error);
+		}
+		
+		function makeErrors(num){
+			for(var i=0; i<num; ++i){
+				makeError();
+			}
+		}
+		
+		function int(){
+			var randBackground = returnArray(arr_backgrounds);
+			//change background image
+			if(Math.random()*100 > 96){
+				document.body.style.background = "url(" + 'images/' + randBackground + ")";
+			}
+			//
+			if(Math.random()*100 > 96){
+				clickBody();
+			}
+		}
+		
+		function pageScrollDown() {
+    		window.scrollBy(0, scrollSpeed);
+    		scrolldelay = setTimeout(pageScrollDown,10);
+		}
+		
+		//go crazy
+		function clickBody(){
+			scrollSpeed = randomRange(-20, 20);
+			if(scrollSpeed == 0){
+				scrollSpeed = 30;
+			}
+		}
+		
+		function start(){
+			
+			makeErrors(500);
+			
+			intervalID = setInterval(int, 50);
+			//checkBottom();
+			pageScrollDown();
+			
+			document.body.addEventListener('click', clickBody); 
+		}
+		
+	</script>
+	
+</head>
+	
+	
+<body onload="start();">
+	<div id="title">YOU ARE IN THE ERROR ZONE!</div>
+	<div id="footer">WELCOME TO THE ERROR ZONE!</div>
+	<div id="audioContainer">
+		<audio
+			controls
+			autoplay
+			loop
+        src="audio/GNOS.mp3">
+            Your browser does not support the
+            <code>audio</code> element.
+		</audio>
+	</div>
+	
+</body>
+</html>
