@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<application xmlns="http://ns.adobe.com/air/application/13.0">
+    <id>com.alienmelon.haxatron2000</id>
+    <versionNumber>2.0.3</versionNumber>
+    <filename>Malloc_AS3</filename>
+    <description></description>
+    <!-- To localize the description, use the following format for the description element.
+	<description>
+		<text xml:lang="en">English App description goes here</text>
+		<text xml:lang="fr">French App description goes here</text>
+		<text xml:lang="ja">Japanese App description goes here</text>
+	</description>
+	-->
+    <name>Malloc_AS3</name>
+    <!-- To localize the name, use the following format for the name element.
+	<name>
+		<text xml:lang="en">English App name goes here</text>
+		<text xml:lang="fr">French App name goes here</text>
+		<text xml:lang="ja">Japanese App name goes here</text>
+	</name>
+	-->
+    <copyright></copyright>
+    <initialWindow>
+        <content>Malloc_AS3.swf</content>
+        <systemChrome>standard</systemChrome>
+        <transparent>false</transparent>
+        <visible>true</visible>
+        <fullScreen>true</fullScreen>
+        <autoOrients>false</autoOrients>
+        <aspectRatio>landscape</aspectRatio>
+        <renderMode>auto</renderMode>
+    </initialWindow>
+    <customUpdateUI>false</customUpdateUI>
+    <allowBrowserInvocation>false</allowBrowserInvocation>
+    <icon>
+        <image36x36>Icons/36x36.png</image36x36>
+        <image48x48>Icons/48x48.png</image48x48>
+        <image72x72>Icons/72x72.png</image72x72>
+        <image96x96>Icons/96x96.png</image96x96>
+    </icon>
+    <supportedLanguages>en</supportedLanguages>
+    <android>
+        <manifestAdditions><![CDATA[
+	    <manifest android:installLocation="auto">
+	        <uses-sdk android:targetSdkVersion="13"/>
+			<uses-sdk android:minSdkVersion="8"/>
+			<uses-permission android:name="android.permission.INTERNET"/>
+		</manifest>
+			]]></manifestAdditions>
+    </android>
+    <versionLabel>2.0.3</versionLabel>
+</application>
